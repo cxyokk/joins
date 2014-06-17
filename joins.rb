@@ -8,52 +8,54 @@ class Joins
     @joins += %w'left_join_only_left full_join_no_intersect'
   end
 
-  def gogogo
+  def show_me
     puts 'ta: ' + @ta.to_s
     puts 'tb: ' + @tb.to_s
     @joins.each do |j|
       puts "\n" + j + ':'
-      pp 'ta', 'tb'
-      send(j)
+      p_row 'ta', 'tb'
+      p_table send(j)
     end
   end
 
-  def pp(*args)
-    puts "\t" + args.map {|i|
+private
+
+  def p_row(*args)
+    puts args.map {|i|
       i.nil? ? 'NULL' : i.to_s
-    }.join("\t")
+    }.join("\t").prepend "\t"
   end
 
-  def ppppp(rows)
+  def p_table(rows)
     rows.each do |i|
       a = @ta.include?(i) ? i : nil
       b = @tb.include?(i) ? i : nil
-      pp a, b
+      p_row a, b
     end
   end
 
   def inner_join
-    ppppp @ta & @tb
+    @ta & @tb
   end
 
   def left_outer_join
-    ppppp @ta
+    @ta
   end
 
   def full_outer_join
-    ppppp @ta | @tb
+    @ta | @tb
   end
 
   def left_join_only_left
-    ppppp(@ta.select do |i|
+    @ta.select do |i|
       not @tb.include? i
-    end)
+    end
   end
  
   def full_join_no_intersect
-    ppppp (@ta | @tb) - (@ta & @tb)
+    (@ta | @tb) - (@ta & @tb)
   end
 
 end
 
-Joins.new.gogogo
+Joins.new.show_me
